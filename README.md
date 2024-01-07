@@ -17,6 +17,8 @@ To install the kubernetes-service-orchestrator chart:
 
 Create `values.yaml` file
 > **_NOTE:_**  For a complete set of options see [link](https://github.com/4spacesdk/kubernetes-service-orchestrator/blob/main/charts/kso/values.yaml)
+
+
 ```
 ingress:
   enabled: true
