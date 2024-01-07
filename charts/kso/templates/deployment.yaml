@@ -1,0 +1,95 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "kso.fullname" . }}
+  labels:
+    {{- include "kso.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount | default 1 }}
+  selector:
+    matchLabels:
+      {{- include "kso.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "kso.labels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "kso.serviceAccountName" . }}
+      {{- if .Values.podSecurityContext }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          {{- if .Values.securityContext }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          {{- end }}
+          image: "4spaces/kubernetes-service-orchestrator:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy | default "IfNotPresent"  }}
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+          {{- if .Values.resources }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          {{- end }}
+          env:
+            - name: ENVIRONMENT
+              value: {{ .Values.deployment.environment | default "production" }}
+              {{- if .Values.ingress.hosts }}
+              {{- with first .Values.ingress.hosts }}
+            - name: BASE_URL
+              value: https://{{ .host }}
+            - name: ZMQ_EXTERNAL_URL
+              value: wss://{{ .host }}/socket
+              {{- end }}
+              {{- end }}
+            - name: DB_HOST
+              value: {{ required "Database is required" .Values.deployment.database.host }}
+            - name: DB_NAME
+              value: {{ required "Database is required" .Values.deployment.database.name }}
+            - name: DB_USER
+              value: {{ required "Database is required" .Values.deployment.database.user }}
+            - name: DB_PASS
+              value: {{ required "Database is required" .Values.deployment.database.pass }}
+            - name: KUBERNETES_AUTH
+              value: in-cluster
+            - name: REMOTE_CLUSTER_URL
+              value: {{ required "You need to provide a remote cluster url" .Values.deployment.kubernetes.remoteClusterUrl }}
+            {{- range .Values.deployment.env }}
+            - name: {{ .name }}
+              value: {{ .value }}
+            {{- end}}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

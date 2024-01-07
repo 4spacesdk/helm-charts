@@ -1,0 +1,43 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "kso.fullname" . }}
+  labels:
+    {{- include "kso.labels" . | nindent 4 }}
+spec:
+  activeDeadlineSeconds: 21600
+  ttlSecondsAfterFinished: 30
+  template:
+    metadata:
+      labels:
+        app: {{ include "kso.fullname" . }}
+        role: migration
+    spec:
+      serviceAccountName: {{ include "kso.serviceAccountName" . }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "4spaces/kubernetes-service-orchestrator:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy | default "IfNotPresent"  }}
+          command:
+            - /bin/sh
+          args:
+            - -c
+            - cd /var/www/html/ci4 && php spark migrate
+          env:
+            - name: ENVIRONMENT
+              value: {{ .Values.deployment.environment | default "production" }}
+              {{- if .Values.ingress.hosts }}
+              {{- with first .Values.ingress.hosts }}
+            - name: BASE_URL
+              value: https://{{ .host }}
+              {{- end }}
+              {{- end }}
+            - name: DB_HOST
+              value: {{ required "Database is required" .Values.deployment.database.host }}
+            - name: DB_NAME
+              value: {{ required "Database is required" .Values.deployment.database.name }}
+            - name: DB_USER
+              value: {{ required "Database is required" .Values.deployment.database.user }}
+            - name: DB_PASS
+              value: {{ required "Database is required" .Values.deployment.database.pass }}
+      restartPolicy: Never
