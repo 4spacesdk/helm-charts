@@ -79,7 +79,7 @@ spec:
               value: {{ required "You need to provide a remote cluster url" .Values.deployment.kubernetes.remoteClusterUrl }}
             {{- range .Values.deployment.env }}
             - name: {{ .name }}
-              value: {{ .value }}
+              value: {{ .value | quote }}
             {{- end}}
       {{- with .Values.nodeSelector }}
       nodeSelector:
