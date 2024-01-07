@@ -57,7 +57,7 @@ deployment:
 
 
 ```
-helm upgrade --install kso 4spacesdk/kubernetes-service-orchestrator --values=values.yaml --namespace kso --create-namespace
+helm upgrade --install kso 4spacesdk/kso --values=values.yaml --namespace kso --create-namespace
 ```
 
 To uninstall the chart:
