@@ -17,6 +17,7 @@ fullnameOverride: ""
 deployment:
 
   # Valid values: development, production
+  # development will show errors, production will not
   environment: ""
 
   # You need to provide a MySQL database
