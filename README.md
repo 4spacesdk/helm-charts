@@ -15,8 +15,8 @@ the latest versions of the packages.  You can then run `helm search repo
 
 To install the kubernetes-service-orchestrator chart:
 
-Create `values.yaml` file
-> **_NOTE:_**  For a complete set of options see [link](https://github.com/4spacesdk/kubernetes-service-orchestrator/blob/main/charts/kso/values.yaml)
+### Create `values.yaml` file
+For a complete set of options see [link](https://github.com/4spacesdk/kubernetes-service-orchestrator/blob/main/charts/kso/values.yaml)
 
 
 ```
@@ -54,6 +54,7 @@ deployment:
 #    - name: ""
 #      value: ""
 ```
+
 
 ```
 helm upgrade --install kso 4spacesdk/kubernetes-service-orchestrator --values=values.yaml --namespace kso --create-namespace
