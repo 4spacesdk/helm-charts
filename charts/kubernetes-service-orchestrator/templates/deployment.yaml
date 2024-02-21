@@ -30,6 +30,13 @@ spec:
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       {{- end }}
+      initContainers:
+        - name: wait-for-migration
+          image: ghcr.io/groundnuty/k8s-wait-for:v2.0
+          imagePullPolicy: IfNotPresent
+          args:
+            - job
+            - {{ include "kso.fullname" . }}
       containers:
         - name: {{ .Chart.Name }}
           {{- if .Values.securityContext }}
@@ -77,6 +84,14 @@ spec:
               value: in-cluster
             - name: REMOTE_CLUSTER_URL
               value: {{ required "You need to provide a remote cluster url" .Values.deployment.kubernetes.remoteClusterUrl }}
+            {{- if .Values.deployment.config.defaults.imagePullSecretName }}
+            - name: IMAGE_PULL_SECRET_DEFAULT_NAME
+              value: {{ .Values.deployment.config.defaults.imagePullSecretName }}
+            {{- end}}
+            {{- if .Values.deployment.config.defaults.certManagerIssuerName }}
+            - name: CERT_MANAGER_ISSUER_DEFAULT_NAME
+              value: {{ .Values.deployment.config.defaults.certManagerIssuerName }}
+            {{- end}}
             {{- range .Values.deployment.env }}
             - name: {{ .name }}
               value: {{ .value | quote }}

@@ -32,6 +32,11 @@ deployment:
   kubernetes:
     remoteClusterUrl: "https://kubernetes.default.svc.cluster.local"
 
+  config:
+    defaults:
+      imagePullSecretName: ""
+      certManagerIssuerName: ""
+
   env: [ ]
 #  env:
 #    - name: ""
