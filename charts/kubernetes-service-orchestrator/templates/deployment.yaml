@@ -96,6 +96,18 @@ spec:
             - name: {{ .name }}
               value: {{ .value | quote }}
             {{- end}}
+            {{- if .Values.deployment.config.email }}
+            - name: EMAIL_SERVICE_HOST
+              value: {{ .Values.deployment.config.email.host }}
+            - name: EMAIL_SERVICE_PORT
+              value: {{ .Values.deployment.config.email.port }}
+            - name: EMAIL_SERVICE_USER
+              value: {{ .Values.deployment.config.email.user }}
+            - name: EMAIL_SERVICE_PASS
+              value: {{ .Values.deployment.config.email.pass }}
+            - name: EMAIL_SERVICE_SENDER
+              value: {{ .Values.deployment.config.email.sender }}
+            {{- end}}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
