@@ -98,15 +98,15 @@ spec:
             {{- end}}
             {{- if .Values.deployment.config.email }}
             - name: EMAIL_SERVICE_HOST
-              value: {{ .Values.deployment.config.email.host }}
+              value: {{ .Values.deployment.config.email.host | quote }}
             - name: EMAIL_SERVICE_PORT
-              value: {{ .Values.deployment.config.email.port }}
+              value: {{ .Values.deployment.config.email.port | quote }}
             - name: EMAIL_SERVICE_USER
-              value: {{ .Values.deployment.config.email.user }}
+              value: {{ .Values.deployment.config.email.user | quote }}
             - name: EMAIL_SERVICE_PASS
-              value: {{ .Values.deployment.config.email.pass }}
+              value: {{ .Values.deployment.config.email.pass | quote }}
             - name: EMAIL_SERVICE_SENDER
-              value: {{ .Values.deployment.config.email.sender }}
+              value: {{ .Values.deployment.config.email.sender | quote }}
             {{- end}}
       {{- with .Values.nodeSelector }}
       nodeSelector:
