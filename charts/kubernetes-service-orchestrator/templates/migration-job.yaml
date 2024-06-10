@@ -6,7 +6,6 @@ metadata:
     {{- include "kso.labels" . | nindent 4 }}
 spec:
   activeDeadlineSeconds: 21600
-  ttlSecondsAfterFinished: 30
   template:
     metadata:
       labels:
@@ -40,4 +39,4 @@ spec:
               value: {{ required "Database is required" .Values.deployment.database.user }}
             - name: DB_PASS
               value: {{ required "Database is required" .Values.deployment.database.pass }}
-      restartPolicy: Never
+      restartPolicy: OnFailure
