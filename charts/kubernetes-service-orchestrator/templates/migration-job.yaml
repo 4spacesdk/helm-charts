@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: "{{ include 'kso.fullname' . }}-{{ .Values.image.tag  | default .Chart.AppVersion }}"
+  name: {{ include "kso.fullname" . }}-migration-{{ .Values.image.tag | default .Chart.AppVersion }}
   labels:
     {{- include "kso.labels" . | nindent 4 }}
 spec:
