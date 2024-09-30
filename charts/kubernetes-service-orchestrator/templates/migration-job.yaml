@@ -9,7 +9,7 @@ spec:
   template:
     metadata:
       labels:
-        app: {{ include "kso.fullname" . }}-{{ .Values.image.tag | default .Chart.AppVersion | replace "." "-" }}
+        app: {{ include "kso.fullname" . }}
         role: migration
     spec:
       serviceAccountName: {{ include "kso.serviceAccountName" . }}
