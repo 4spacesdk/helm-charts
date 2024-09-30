@@ -36,7 +36,7 @@ spec:
           imagePullPolicy: IfNotPresent
           args:
             - job
-            - {{ include 'kso.fullname' . }}-migration-{{ .Values.image.tag | default .Chart.AppVersion }}
+            - {{ include "kso.fullname" . }}-migration-{{ .Values.image.tag | default .Chart.AppVersion }}
       containers:
         - name: {{ .Chart.Name }}
           {{- if .Values.securityContext }}
