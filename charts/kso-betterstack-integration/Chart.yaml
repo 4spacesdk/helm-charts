@@ -1,5 +1,5 @@
 apiVersion: v2
-name: kso
+name: kso-betterstack-integration
 description: Connect KSO with Better Stack for automatically uptime tracking and alerts
 type: application
 version: 1.0.0
