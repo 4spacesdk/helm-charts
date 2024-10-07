@@ -388,6 +388,23 @@ entries:
   kso-betterstack-integration:
   - apiVersion: v2
     appVersion: 1.0.2
+    created: "2024-10-07T18:24:58.969474784Z"
+    description: Connect KSO with Better Stack for automatically uptime tracking and
+      alerts
+    digest: 9c7712925020f4bbfff60b2bc946c1e1267dabbfd3b7204defd5f416818a5882
+    home: https://github.com/4spacesdk/kso-betterstack-integration
+    icon: https://4spaces.dk/assets/four-spaces-white.svg
+    maintainers:
+    - name: Martin-4Spaces
+    name: kso-betterstack-integration
+    sources:
+    - https://github.com/4spacesdk/kso-betterstack-integration
+    type: application
+    urls:
+    - https://github.com/4spacesdk/helm-charts/releases/download/kso-betterstack-integration-1.0.5/kso-betterstack-integration-1.0.5.tgz
+    version: 1.0.5
+  - apiVersion: v2
+    appVersion: 1.0.2
     created: "2024-10-07T18:20:04.837184052Z"
     description: Connect KSO with Better Stack for automatically uptime tracking and
       alerts
@@ -471,4 +488,4 @@ entries:
     urls:
     - https://github.com/4spacesdk/helm-charts/releases/download/kso-betterstack-integration-1.0.0/kso-betterstack-integration-1.0.0.tgz
     version: 1.0.0
-generated: "2024-10-07T18:20:04.83732223Z"
+generated: "2024-10-07T18:24:58.969573328Z"
