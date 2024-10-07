@@ -1,0 +1,12 @@
+apiVersion: v2
+name: kso
+description: Connect KSO with Better Stack for automatically uptime tracking and alerts
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+home: https://github.com/4spacesdk/kso-betterstack-integration
+sources:
+  - https://github.com/4spacesdk/kso-betterstack-integration
+icon: https://4spaces.dk/assets/four-spaces-white.svg
+maintainers:
+  - name: Martin-4Spaces
