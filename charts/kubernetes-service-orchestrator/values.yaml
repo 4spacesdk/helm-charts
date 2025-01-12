@@ -84,11 +84,24 @@ ingress:
     - host: chart-example.local
       paths:
         - path: /
-          pathType: ImplementationSpecific
+          pathType: Prefix
   tls: [ ]
   #  - secretName: chart-example-tls
   #    hosts:
   #      - chart-example.local
+
+istio:
+  hosts:
+    - chart-example.local
+  gateway:
+    enabled: false
+    selector:
+      istio: ingressgateway
+    tls:
+      enabled: false
+      secretName: chart-example-tls
+  virtualservice:
+    enabled: false
 
 resources: { }
   # We usually recommend not to specify default resources and to leave this as a conscious

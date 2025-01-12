@@ -1,0 +1,32 @@
+{{- if .Values.istio.virtualservice.enabled -}}
+{{- $fullName := include "kso.fullname" . -}}
+apiVersion: networking.istio.io/v1
+kind: VirtualService
+metadata:
+  name: {{ $fullName }}
+spec:
+  gateways:
+    - {{ .Release.Namespace }}/{{ $fullName }}
+  hosts:
+    {{- range .Values.istio.hosts }}
+    - {{ . | quote }}
+    {{- end }}
+  http:
+    - match:
+        - uri:
+            prefix: /socket
+      route:
+        - destination:
+            host: kso.kso.svc.cluster.local
+            port:
+              number: 9100
+    - match:
+        - uri:
+            prefix: /
+      route:
+        - destination:
+            host: kso.kso.svc.cluster.local
+            port:
+              number: 80
+
+{{- end }}

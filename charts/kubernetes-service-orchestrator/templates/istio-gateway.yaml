@@ -1,0 +1,38 @@
+{{- if .Values.istio.gateway.enabled -}}
+{{- $fullName := include "kso.fullname" . -}}
+apiVersion: networking.istio.io/v1
+kind: Gateway
+metadata:
+  name: {{ $fullName }}
+spec:
+  {{- with .Values.istio.gateway.selector }}
+  selector:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  servers:
+    - port:
+        name: http
+        number: 80
+        protocol: HTTP
+      hosts:
+        {{- range .Values.istio.hosts }}
+        - {{ . | quote }}
+        {{- end }}
+      {{- if .Values.istio.gateway.tls.enabled }}
+      tls:
+        httpsRedirect: true
+      {{- end }}
+    {{- if .Values.istio.gateway.tls.enabled }}
+    - port:
+        name: https
+        number: 443
+        protocol: HTTPS
+      hosts:
+        {{- range .Values.istio.hosts }}
+        - {{ . | quote }}
+        {{- end }}
+      tls:
+        mode: SIMPLE
+        credentialName: {{ .Values.istio.gateway.tls.secretName }}
+    {{- end }}
+{{- end }}
