@@ -17,7 +17,7 @@ spec:
             prefix: /socket
       route:
         - destination:
-            host: kso.kso.svc.cluster.local
+            host: {{ $fullName }}.{{ .Release.Namespace }}.svc.cluster.local
             port:
               number: 9100
     - match:
@@ -25,8 +25,7 @@ spec:
             prefix: /
       route:
         - destination:
-            host: kso.kso.svc.cluster.local
+            host: {{ $fullName }}.{{ .Release.Namespace }}.svc.cluster.local
             port:
               number: 80
-
 {{- end }}

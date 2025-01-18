@@ -1,0 +1,44 @@
+{{- if .Values.contour.enabled -}}
+{{- $fullName := include "kso.fullname" . -}}
+apiVersion: projectcontour.io/v1
+kind: HTTPProxy
+metadata:
+  name: {{ $fullName }}
+spec:
+  ingressClassName: {{ .Values.contour.className }}
+  routes:
+    - conditions:
+        - prefix: /socket
+      enableWebsockets: true
+      requestHeadersPolicy:
+        set:
+          - name: Host
+            value: {{ $fullName }}.{{ .Release.Namespace }}.svc.cluster.local
+      services:
+        - name: {{ $fullName }}
+          port: 9100
+          requestHeadersPolicy:
+            set:
+              - name: K-Original-Host
+                value: {{ .Values.contour.host }}
+    - conditions:
+        - prefix: /
+      enableWebsockets: true
+      requestHeadersPolicy:
+        set:
+          - name: Host
+            value: {{ $fullName }}.{{ .Release.Namespace }}.svc.cluster.local
+      services:
+        - name: {{ $fullName }}
+          port: 80
+          requestHeadersPolicy:
+            set:
+              - name: K-Original-Host
+                value: {{ .Values.contour.host }}
+  virtualhost:
+    fqdn: {{ .Values.contour.host }}
+    {{- if .Values.contour.tls.enabled -}}
+    tls:
+      secretName: {{ .Values.contour.tls.secretName }}
+    {{- end }}
+{{- end }}

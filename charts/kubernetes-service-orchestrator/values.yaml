@@ -91,6 +91,7 @@ ingress:
   #      - chart-example.local
 
 istio:
+  enabled: false
   hosts:
     - chart-example.local
   gateway:
@@ -102,6 +103,14 @@ istio:
       secretName: chart-example-tls
   virtualservice:
     enabled: false
+
+contour:
+  enabled: false
+  className: contour-external
+  host: chart-example.local
+  tls:
+    enabled: false
+    secretName: chart-example-tls
 
 resources: { }
   # We usually recommend not to specify default resources and to leave this as a conscious
