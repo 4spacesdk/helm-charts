@@ -37,8 +37,8 @@ spec:
                 value: {{ .Values.contour.host }}
   virtualhost:
     fqdn: {{ .Values.contour.host }}
-{{- if .Values.contour.tls.enabled -}}
+    {{- if .Values.contour.tls.enabled }}
     tls:
       secretName: {{ .Values.contour.tls.secretName }}
-{{- end }}
+    {{- end }}
 {{- end }}
