@@ -10,31 +10,14 @@ spec:
     - conditions:
         - prefix: /socket
       enableWebsockets: true
-      requestHeadersPolicy:
-        set:
-          - name: Host
-            value: {{ $fullName }}.{{ .Release.Namespace }}.svc.cluster.local
       services:
         - name: {{ $fullName }}
           port: 9100
-          requestHeadersPolicy:
-            set:
-              - name: K-Original-Host
-                value: {{ .Values.contour.host }}
     - conditions:
         - prefix: /
-      enableWebsockets: true
-      requestHeadersPolicy:
-        set:
-          - name: Host
-            value: {{ $fullName }}.{{ .Release.Namespace }}.svc.cluster.local
       services:
         - name: {{ $fullName }}
           port: 80
-          requestHeadersPolicy:
-            set:
-              - name: K-Original-Host
-                value: {{ .Values.contour.host }}
   virtualhost:
     fqdn: {{ .Values.contour.host }}
     {{- if .Values.contour.tls.enabled }}
