@@ -231,3 +231,14 @@ rules:
       - list
       - patch
       - update
+  - apiGroups:
+      - rabbitmq.com
+    resources:
+      - rabbitmqclusters
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
