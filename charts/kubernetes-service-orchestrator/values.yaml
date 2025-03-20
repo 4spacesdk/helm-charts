@@ -121,8 +121,34 @@ resources: { }
   #   cpu: 100m
   #   memory: 128Mi
   # requests:
-#   cpu: 100m
-#   memory: 128Mi
+  #   cpu: 100m
+  #   memory: 128Mi
+
+clusterrole: {}
+#  additional-rules:
+#    - apiGroups:
+#        - serving.knative.dev
+#      resources:
+#        - services
+#      verbs:
+#        - create
+#        - delete
+#        - get
+#        - list
+#        - patch
+#        - update
+#    - apiGroups:
+#        - rabbitmq.com
+#      resources:
+#        - rabbitmqclusters
+#      verbs:
+#        - create
+#        - delete
+#        - get
+#        - list
+#        - patch
+#        - update
+
 
 nodeSelector: { }
 

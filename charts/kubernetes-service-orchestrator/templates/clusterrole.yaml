@@ -221,6 +221,7 @@ rules:
       - list
       - patch
       - update
+  {{- if .Values.contour.enabled }}
   - apiGroups:
       - projectcontour.io
     resources:
@@ -232,25 +233,9 @@ rules:
       - list
       - patch
       - update
-  - apiGroups:
-      - serving.knative.dev
-    resources:
-      - services
-    verbs:
-      - create
-      - delete
-      - get
-      - list
-      - patch
-      - update
-  - apiGroups:
-      - rabbitmq.com
-    resources:
-      - rabbitmqclusters
-    verbs:
-      - create
-      - delete
-      - get
-      - list
-      - patch
-      - update
+  {{- end }}
+  {{- if .Values.clusterrole.additional-rules }}
+  {{- toYaml . | nindent 2 }}
+  {{- range .Values.clusterrole.additional-rules }}
+  {{- end}}
+  {{- end }}
