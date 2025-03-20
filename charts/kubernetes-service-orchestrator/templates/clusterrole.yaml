@@ -234,8 +234,8 @@ rules:
       - patch
       - update
   {{- end }}
-  {{- if .Values.clusterrole.additional-rules }}
+  {{- if .Values.clusterrole.additionalRules }}
   {{- toYaml . | nindent 2 }}
-  {{- range .Values.clusterrole.additional-rules }}
+  {{- range .Values.clusterrole.additionalRules }}
   {{- end}}
   {{- end }}

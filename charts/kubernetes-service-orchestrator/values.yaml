@@ -125,7 +125,7 @@ resources: { }
   #   memory: 128Mi
 
 clusterrole: {}
-#  additional-rules:
+#  additionalRules:
 #    - apiGroups:
 #        - serving.knative.dev
 #      resources:
