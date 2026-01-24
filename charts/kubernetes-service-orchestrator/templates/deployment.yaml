@@ -94,6 +94,8 @@ spec:
               {{- end }}
             - name: DB_HOST
               value: {{ required "Database is required" .Values.deployment.database.host }}
+            - name: DB_PORT
+              value: {{ required "Database is required" .Values.deployment.database.port }}
             - name: DB_NAME
               value: {{ required "Database is required" .Values.deployment.database.name }}
             - name: DB_USER
