@@ -96,7 +96,7 @@ spec:
               {{- if .Values.gatewayapi.hosts }}
               {{- with first .Values.gatewayapi.hosts }}
             - name: BASE_URL
-              value: https://{{ .host }}
+              value: https://{{ . }}
             - name: ZMQ_EXTERNAL_URL
               value: wss://{{ .host }}/socket
               {{- end }}
