@@ -98,7 +98,7 @@ spec:
             - name: BASE_URL
               value: https://{{ . }}
             - name: ZMQ_EXTERNAL_URL
-              value: wss://{{ .host }}/socket
+              value: wss://{{ . }}/socket
               {{- end }}
               {{- end }}
               {{- end }}
