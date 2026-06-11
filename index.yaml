@@ -2,6 +2,22 @@ apiVersion: v1
 entries:
   kso:
   - apiVersion: v2
+    appVersion: 1.8.3
+    created: "2026-06-11T07:07:16.912099958Z"
+    description: Service Orchestrator for Kubernetes
+    digest: c94e2aafd4b76663cc51ccd0442336c40889fa16957e0fd490cb7cc7c61bb7c1
+    home: https://github.com/4spacesdk/kubernetes-service-orchestrator
+    icon: https://4spaces.dk/assets/four-spaces-white.svg
+    maintainers:
+    - name: Martin-4Spaces
+    name: kso
+    sources:
+    - https://github.com/4spacesdk/kubernetes-service-orchestrator
+    type: application
+    urls:
+    - https://github.com/4spacesdk/helm-charts/releases/download/kso-1.8.3/kso-1.8.3.tgz
+    version: 1.8.3
+  - apiVersion: v2
     appVersion: 1.8.2
     created: "2026-06-11T06:28:06.527133017Z"
     description: Service Orchestrator for Kubernetes
@@ -1514,4 +1530,4 @@ entries:
     urls:
     - https://github.com/4spacesdk/helm-charts/releases/download/kso-betterstack-integration-1.0.0/kso-betterstack-integration-1.0.0.tgz
     version: 1.0.0
-generated: "2026-06-11T06:28:06.527497217Z"
+generated: "2026-06-11T07:07:16.912364713Z"
