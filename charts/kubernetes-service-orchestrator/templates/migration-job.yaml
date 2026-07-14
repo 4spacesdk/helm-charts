@@ -53,6 +53,16 @@ spec:
               value: wss://{{ .Values.contour.host }}/socket
               {{- end }}
               {{- end }}
+              {{- if .Values.gatewayapi.enabled }}
+              {{- if .Values.gatewayapi.hosts }}
+              {{- with first .Values.gatewayapi.hosts }}
+            - name: BASE_URL
+              value: https://{{ . }}
+            - name: ZMQ_EXTERNAL_URL
+              value: wss://{{ . }}/socket
+              {{- end }}
+              {{- end }}
+              {{- end }}
             - name: DB_HOST
               value: {{ required "Database is required" .Values.deployment.database.host }}
             - name: DB_PORT
