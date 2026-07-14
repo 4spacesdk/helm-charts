@@ -1,0 +1,18 @@
+{{- if and (eq .Values.provider "gke") .Values.gatewayapi.healthCheckPolicy.enabled }}
+apiVersion: networking.gke.io/v1
+kind: HealthCheckPolicy
+metadata:
+  name: {{ include "kso.fullname" . }}
+  labels:
+    {{- include "kso.labels" . | nindent 4 }}
+spec:
+  default:
+    config:
+      type: TCP
+      tcpHealthCheck:
+        portSpecification: USE_SERVING_PORT
+  targetRef:
+    group: ""
+    kind: Service
+    name: {{ include "kso.fullname" . }}
+  {{- end }}

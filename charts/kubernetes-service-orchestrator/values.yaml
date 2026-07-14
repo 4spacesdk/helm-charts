@@ -10,6 +10,9 @@ image:
   # Overrides the image tag whose default is the chart appVersion.
   tag: ""
 
+# Select a cloud provider. This will enable provider-specific resources.
+provider: ""          # "gke" | "aks" | "eks" | ""
+
 imagePullSecrets: [ ]
 nameOverride: ""
 fullnameOverride: ""
@@ -113,6 +116,10 @@ contour:
     enabled: false
     secretName: chart-example-tls
 
+# Hvilken cloud-provider chartet deployes til. Styrer provider-specifikke resources.
+
+gateway:
+
 gatewayapi:
   enabled: false
   annotations: {}
@@ -122,6 +129,8 @@ gatewayapi:
 #      namespace: gateway-system
   hosts:
     - chart-example.local
+  healthCheckPolicy:
+    enabled: true
 
 resources: { }
   # We usually recommend not to specify default resources and to leave this as a conscious
