@@ -11,6 +11,8 @@ image:
   tag: ""
 
 # Select a cloud provider. This will enable provider-specific resources.
+# "gke" also grants kso RBAC to manage HealthCheckPolicies (networking.gke.io) for the
+# services it orchestrates, so non-HTTP ports such as websockets stay healthy behind a GKE Gateway.
 provider: ""          # "gke" | "aks" | "eks" | ""
 
 imagePullSecrets: [ ]
@@ -116,10 +118,6 @@ contour:
     enabled: false
     secretName: chart-example-tls
 
-# Hvilken cloud-provider chartet deployes til. Styrer provider-specifikke resources.
-
-gateway:
-
 gatewayapi:
   enabled: false
   annotations: {}
@@ -133,10 +131,6 @@ gatewayapi:
     enabled: true
 
 resources: { }
-  # We usually recommend not to specify default resources and to leave this as a conscious
-  # choice for the user. This also increases chances charts run on environments with little
-  # resources, such as Minikube. If you do want to specify resources, uncomment the following
-  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
   # limits:
   #   cpu: 100m
   #   memory: 128Mi
