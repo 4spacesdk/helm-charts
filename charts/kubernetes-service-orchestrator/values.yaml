@@ -11,8 +11,9 @@ image:
   tag: ""
 
 # Select a cloud provider. This will enable provider-specific resources.
-# "gke" also grants kso RBAC to manage HealthCheckPolicies (networking.gke.io) for the
-# services it orchestrates, so non-HTTP ports such as websockets stay healthy behind a GKE Gateway.
+# "gke" also grants kso RBAC to manage HealthCheckPolicies and GCPBackendPolicies (networking.gke.io)
+# for the services it orchestrates - so non-HTTP ports such as websockets stay healthy, and backend
+# request timeouts can be raised above GKE's 30s default, behind a GKE Gateway.
 provider: ""          # "gke" | "aks" | "eks" | ""
 
 imagePullSecrets: [ ]

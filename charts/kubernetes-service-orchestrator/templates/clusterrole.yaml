@@ -235,11 +235,13 @@ rules:
       - update
   {{- end }}
   {{- if eq .Values.provider "gke" }}
-  # Allows kso to manage a HealthCheckPolicy for the services it orchestrates behind a GKE Gateway.
+  # Allows kso to manage a HealthCheckPolicy and a GCPBackendPolicy for the services it
+  # orchestrates behind a GKE Gateway.
   - apiGroups:
       - networking.gke.io
     resources:
       - healthcheckpolicies
+      - gcpbackendpolicies
     verbs:
       - create
       - delete
