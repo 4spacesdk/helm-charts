@@ -234,6 +234,20 @@ rules:
       - patch
       - update
   {{- end }}
+  # Allows kso to manage Gateways, HTTPRoutes (including alias redirects) and ReferenceGrants.
+  - apiGroups:
+      - gateway.networking.k8s.io
+    resources:
+      - gateways
+      - httproutes
+      - referencegrants
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
   {{- if eq .Values.provider "gke" }}
   # Allows kso to manage a HealthCheckPolicy and a GCPBackendPolicy for the services it
   # orchestrates behind a GKE Gateway.
