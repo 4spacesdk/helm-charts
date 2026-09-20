@@ -5,7 +5,7 @@ metadata:
   labels:
     {{- include "kso.labels" . | nindent 4 }}
 spec:
-  activeDeadlineSeconds: 21600
+  activeDeadlineSeconds: {{ .Values.migration.activeDeadlineSeconds | default 1800 }}
   template:
     metadata:
       labels:
@@ -73,4 +73,10 @@ spec:
               value: {{ required "Database is required" .Values.deployment.database.user }}
             - name: DB_PASS
               value: {{ required "Database is required" .Values.deployment.database.pass }}
+            - name: ENCRYPTION_KEY
+              value: {{ required "An encryption key is required. It is what the credentials kso stores for other systems are encrypted with, and it has to stay the same for the life of the installation - losing it means those credentials cannot be read back." .Values.deployment.encryptionKey }}
+            {{- if .Values.deployment.previousEncryptionKeys }}
+            - name: ENCRYPTION_PREVIOUS_KEYS
+              value: {{ .Values.deployment.previousEncryptionKeys | quote }}
+            {{- end }}
       restartPolicy: OnFailure
