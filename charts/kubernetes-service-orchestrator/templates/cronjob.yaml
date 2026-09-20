@@ -21,8 +21,19 @@ spec:
                 limits:
                   cpu: 100m
                   memory: 128Mi
+              # The endpoint runs every cron job in the installation, so it asks who is
+              # calling. The token is the one kso is given, from the same Secret.
+              #
+              # `-f` so a refusal fails the job: without it curl exits 0 on a 401 and the
+              # scheduler would quietly stop running anything, with nothing to see.
+              env:
+                - name: CRON_TOKEN
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ include "kso.fullname" . }}-cron
+                      key: cron-token
               args:
                 - /bin/sh
                 - -ec
-                - curl {{ include "kso.fullname" . }}.{{ .Release.Namespace }}/api/jobby
+                - curl -fsS -H "X-Cron-Token: $CRON_TOKEN" {{ include "kso.fullname" . }}.{{ .Release.Namespace }}/api/jobby
           restartPolicy: Never

@@ -114,6 +114,11 @@ spec:
               value: {{ required "Database is required" .Values.deployment.database.pass }}
             - name: ENCRYPTION_KEY
               value: {{ required "An encryption key is required. It is what the credentials kso stores for other systems are encrypted with, and it has to stay the same for the life of the installation - losing it means those credentials cannot be read back." .Values.deployment.encryptionKey }}
+            - name: CRON_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "kso.fullname" . }}-cron
+                  key: cron-token
             {{- if .Values.deployment.previousEncryptionKeys }}
             - name: ENCRYPTION_PREVIOUS_KEYS
               value: {{ .Values.deployment.previousEncryptionKeys | quote }}
