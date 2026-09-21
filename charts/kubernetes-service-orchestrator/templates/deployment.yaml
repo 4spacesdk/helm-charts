@@ -135,6 +135,10 @@ spec:
             - name: CERT_MANAGER_ISSUER_DEFAULT_NAME
               value: {{ .Values.deployment.config.defaults.certManagerIssuerName }}
             {{- end}}
+            {{- if .Values.deployment.config.swaggerEnabled }}
+            - name: SWAGGER_ENABLED
+              value: "true"
+            {{- end}}
             {{- range .Values.deployment.env }}
             - name: {{ .name }}
               value: {{ .value | quote }}

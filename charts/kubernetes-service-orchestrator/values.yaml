@@ -54,6 +54,10 @@ deployment:
       imagePullSecretName: ""
       certManagerIssuerName: ""
 
+    # Serve Swagger - the API documentation page and the description of every endpoint it
+    # reads - at /api/swagger. Both answer without a sign-in, so it is off unless turned on.
+    swaggerEnabled: false
+
     # Enable email features. Used for "forgot password". This is optional.
 #    email:
 #      host: ""
