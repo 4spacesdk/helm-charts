@@ -132,6 +132,10 @@ spec:
             - name: CERT_MANAGER_ISSUER_DEFAULT_NAME
               value: {{ .Values.deployment.config.defaults.certManagerIssuerName }}
             {{- end}}
+            {{- with include "kso.allowedHostnames" . }}
+            - name: ALLOWED_HOSTNAMES
+              value: {{ . | quote }}
+            {{- end }}
             {{- if .Values.deployment.config.swaggerEnabled }}
             - name: SWAGGER_ENABLED
               value: "true"

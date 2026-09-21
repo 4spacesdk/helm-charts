@@ -65,6 +65,11 @@ deployment:
     # reads - at /api/swagger. Both answer without a sign-in, so it is off unless turned on.
     swaggerEnabled: false
 
+    # Hostnames kso is also reached on that none of the routings below know about - an ingress
+    # made outside this chart, say. kso answers only on the routing hosts and these; a request
+    # naming any other host gets absolute urls with the first routing host.
+    extraHostnames: [ ]
+
     # Enable email features. Used for "forgot password". This is optional.
 #    email:
 #      host: ""

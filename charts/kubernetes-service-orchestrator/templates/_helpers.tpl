@@ -92,3 +92,18 @@ followed into `helm get manifest`, GitOps diffs and backups of the objects.
       optional: true
 {{- end }}
 {{- end }}
+
+{{/*
+Every hostname kso is served on, comma separated: the hosts of each routing that is turned
+on, and deployment.config.extraHostnames. kso writes absolute urls with BASE_URL - the first
+host - and answers on these as well; any other Host header is not trusted.
+*/}}
+{{- define "kso.allowedHostnames" -}}
+{{- $hosts := list -}}
+{{- if .Values.ingress.enabled }}{{ range .Values.ingress.hosts }}{{ $hosts = append $hosts .host }}{{ end }}{{ end -}}
+{{- if .Values.istio.enabled }}{{ range .Values.istio.hosts }}{{ $hosts = append $hosts . }}{{ end }}{{ end -}}
+{{- if and .Values.contour.enabled .Values.contour.host }}{{ $hosts = append $hosts .Values.contour.host }}{{ end -}}
+{{- if .Values.gatewayapi.enabled }}{{ range .Values.gatewayapi.hosts }}{{ $hosts = append $hosts . }}{{ end }}{{ end -}}
+{{- range .Values.deployment.config.extraHostnames }}{{ $hosts = append $hosts . }}{{ end -}}
+{{- $hosts | uniq | join "," -}}
+{{- end }}
