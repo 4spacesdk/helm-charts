@@ -136,6 +136,8 @@ spec:
             - name: ALLOWED_HOSTNAMES
               value: {{ . | quote }}
             {{- end }}
+            - name: TRIVY_CACHE_DIR
+              value: /var/cache/kso-trivy
             {{- if .Values.deployment.config.swaggerEnabled }}
             - name: SWAGGER_ENABLED
               value: "true"
@@ -160,6 +162,16 @@ spec:
             - name: EMAIL_SERVICE_SENDER
               value: {{ .Values.deployment.config.email.sender | quote }}
             {{- end}}
+          # Trivy's vulnerability databases, kept between the nightly image scans: 1.3 GB, and
+          # 1.4 GB more once an image with Java in it has been scanned. A volume of its own so the
+          # size is limited and shows up as the pod's, instead of filling the node unnoticed.
+          volumeMounts:
+            - name: trivy-cache
+              mountPath: /var/cache/kso-trivy
+      volumes:
+        - name: trivy-cache
+          emptyDir:
+            sizeLimit: {{ .Values.deployment.imageScanning.cacheSizeLimit | default "4Gi" }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

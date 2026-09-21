@@ -52,6 +52,12 @@ deployment:
   # encryption-previous-keys and email-pass.
   existingSecret: ""
 
+  # kso scans the images your deployments run for known vulnerabilities, every night, with
+  # Trivy. Its databases are kept on a volume of this size between scans: 1.3 GB, plus 1.4 GB
+  # once an image with Java in it has been scanned. They are fetched again when the pod starts.
+  imageScanning:
+    cacheSizeLimit: 4Gi
+
   # The default url is "https://kubernetes.default.svc.cluster.local".
   # But it can be different depending on provider
   kubernetes:
@@ -169,13 +175,18 @@ gatewayapi:
   healthCheckPolicy:
     enabled: true
 
-resources: { }
-  # limits:
-  #   cpu: 100m
-  #   memory: 128Mi
-  # requests:
-  #   cpu: 100m
-  #   memory: 128Mi
+# Measured: about 90Mi idle - Apache, PHP and the zmq server - and 110-180Mi more while
+# Trivy scans an image, one at a time. An image with many layers or Java in it takes more,
+# and so does the first scan after a start, which fetches Trivy's databases. The limit leaves
+# room for that. Trivy's databases are read through the page cache, which counts towards the
+# limit but is given back before the pod is killed.
+# No CPU limit: a scan is short and CPU-bound, and a limit only makes it slower.
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    memory: 1Gi
 
 clusterrole: {}
 #  additionalRules:
