@@ -44,6 +44,13 @@ deployment:
   # the previous one can still be read until they have been saved again.
   previousEncryptionKeys: ""
 
+  # A Secret of your own to read the passwords and the encryption key from, instead of the
+  # one this chart makes from database.pass, encryptionKey, previousEncryptionKeys and
+  # config.email.pass - for External Secrets, Sealed Secrets and the like, so the values
+  # never have to be in values at all. Keys: db-pass, encryption-key, and optionally
+  # encryption-previous-keys and email-pass.
+  existingSecret: ""
+
   # The default url is "https://kubernetes.default.svc.cluster.local".
   # But it can be different depending on provider
   kubernetes:

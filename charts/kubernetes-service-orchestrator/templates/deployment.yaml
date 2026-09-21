@@ -11,10 +11,14 @@ spec:
       {{- include "kso.selectorLabels" . | nindent 6 }}
   template:
     metadata:
-      {{- with .Values.podAnnotations }}
       annotations:
+        {{- if not .Values.deployment.existingSecret }}
+        # Values read from a Secret are not reloaded; a changed password rolls the pods.
+        checksum/credentials: {{ include (print $.Template.BasePath "/secret-credentials.yaml") . | sha256sum }}
+        {{- end }}
+        {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
-      {{- end }}
+        {{- end }}
       labels:
         {{- include "kso.labels" . | nindent 8 }}
         {{- with .Values.podLabels }}
@@ -103,26 +107,19 @@ spec:
               {{- end }}
               {{- end }}
             - name: DB_HOST
-              value: {{ required "Database is required" .Values.deployment.database.host }}
+              value: {{ required "Database is required" .Values.deployment.database.host | quote }}
             - name: DB_PORT
-              value: "{{ required "Database is required" .Values.deployment.database.port }}"
+              value: {{ required "Database is required" .Values.deployment.database.port | quote }}
             - name: DB_NAME
-              value: {{ required "Database is required" .Values.deployment.database.name }}
+              value: {{ required "Database is required" .Values.deployment.database.name | quote }}
             - name: DB_USER
-              value: {{ required "Database is required" .Values.deployment.database.user }}
-            - name: DB_PASS
-              value: {{ required "Database is required" .Values.deployment.database.pass }}
-            - name: ENCRYPTION_KEY
-              value: {{ required "An encryption key is required. It is what the credentials kso stores for other systems are encrypted with, and it has to stay the same for the life of the installation - losing it means those credentials cannot be read back." .Values.deployment.encryptionKey }}
+              value: {{ required "Database is required" .Values.deployment.database.user | quote }}
+            {{- include "kso.credentialsEnv" . | nindent 12 }}
             - name: CRON_TOKEN
               valueFrom:
                 secretKeyRef:
                   name: {{ include "kso.fullname" . }}-cron
                   key: cron-token
-            {{- if .Values.deployment.previousEncryptionKeys }}
-            - name: ENCRYPTION_PREVIOUS_KEYS
-              value: {{ .Values.deployment.previousEncryptionKeys | quote }}
-            {{- end }}
             - name: KUBERNETES_AUTH
               value: in-cluster
             - name: REMOTE_CLUSTER_URL
@@ -151,7 +148,11 @@ spec:
             - name: EMAIL_SERVICE_USER
               value: {{ .Values.deployment.config.email.user | quote }}
             - name: EMAIL_SERVICE_PASS
-              value: {{ .Values.deployment.config.email.pass | quote }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "kso.credentialsSecretName" . }}
+                  key: email-pass
+                  optional: true
             - name: EMAIL_SERVICE_SENDER
               value: {{ .Values.deployment.config.email.sender | quote }}
             {{- end}}

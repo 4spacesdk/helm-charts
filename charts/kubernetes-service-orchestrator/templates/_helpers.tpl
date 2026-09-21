@@ -56,3 +56,39 @@ Create the name of the service account to use
 {{- define "kso.serviceAccountName" -}}
 {{- default (include "kso.fullname" .) .Values.serviceAccount.name }}
 {{- end }}
+
+{{/*
+The Secret the passwords and the encryption key are read from: the operator's own when
+deployment.existingSecret names one, otherwise the one this chart makes from values.
+*/}}
+{{- define "kso.credentialsSecretName" -}}
+{{- .Values.deployment.existingSecret | default (printf "%s-credentials" (include "kso.fullname" .)) -}}
+{{- end }}
+
+{{/*
+The environment that comes from that Secret, shared by the deployment and the migration job.
+
+From a Secret rather than as `value:` in the pod spec: anyone allowed to `get` a deployment or
+a job could read them there, which is granted far more often than reading secrets, and they
+followed into `helm get manifest`, GitOps diffs and backups of the objects.
+*/}}
+{{- define "kso.credentialsEnv" -}}
+- name: DB_PASS
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "kso.credentialsSecretName" . }}
+      key: db-pass
+- name: ENCRYPTION_KEY
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "kso.credentialsSecretName" . }}
+      key: encryption-key
+{{- if or .Values.deployment.existingSecret .Values.deployment.previousEncryptionKeys }}
+- name: ENCRYPTION_PREVIOUS_KEYS
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "kso.credentialsSecretName" . }}
+      key: encryption-previous-keys
+      optional: true
+{{- end }}
+{{- end }}
