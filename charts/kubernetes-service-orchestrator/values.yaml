@@ -111,16 +111,22 @@ serviceAccount:
 podAnnotations: { }
 podLabels: { }
 
-podSecurityContext: { }
-# fsGroup: 2000
+# The image runs as www-data (82). fsGroup lets it write Trivy's cache volume.
+podSecurityContext:
+  fsGroup: 82
+  seccompProfile:
+    type: RuntimeDefault
 
-securityContext: { }
-  # capabilities:
-  #   drop:
-  #   - ALL
-  # readOnlyRootFilesystem: true
-# runAsNonRoot: true
-# runAsUser: 1000
+# For kso's container and its migration job. Not readOnlyRootFilesystem: Apache and PHP write
+# their pid, lock and cache files in the image.
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 82
+  runAsGroup: 82
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
 
 service:
   type: ClusterIP

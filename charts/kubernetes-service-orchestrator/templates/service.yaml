@@ -8,7 +8,7 @@ spec:
   type: {{ .Values.service.type | default "ClusterIP" }}
   ports:
     - port: 80
-      targetPort: 80
+      targetPort: http
       protocol: TCP
       name: http
     - port: 8000

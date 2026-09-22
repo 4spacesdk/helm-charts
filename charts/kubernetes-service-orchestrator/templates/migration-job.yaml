@@ -15,6 +15,10 @@ spec:
       serviceAccountName: {{ include "kso.serviceAccountName" . }}
       containers:
         - name: {{ .Chart.Name }}
+          {{- if .Values.securityContext }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          {{- end }}
           image: "4spaces/kubernetes-service-orchestrator:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy | default "IfNotPresent"  }}
           command:

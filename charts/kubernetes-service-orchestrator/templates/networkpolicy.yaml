@@ -1,5 +1,6 @@
 {{/*
-Only the ports meant to be reached: Apache (80) and Centrifugo's client port (8000). Centrifugo's
+Only the ports meant to be reached: Apache (8080 in the pod, 80 on the Service) and Centrifugo's
+client port (8000). Centrifugo's
 API on 9000 takes publishes for every browser and is for kso in the same pod, and nothing else in
 the pod listens for anyone - without a policy every pod in the cluster can reach all of it.
 
@@ -22,7 +23,7 @@ spec:
     - Ingress
   ingress:
     - ports:
-        - port: 80
+        - port: 8080
           protocol: TCP
         - port: 8000
           protocol: TCP
@@ -33,7 +34,7 @@ spec:
     {{- if .Values.networkPolicy.ingressFrom }}
     # The scheduler, whatever ingressFrom says: it runs every cron job through /api/jobby.
     - ports:
-        - port: 80
+        - port: 8080
           protocol: TCP
       from:
         - podSelector:
