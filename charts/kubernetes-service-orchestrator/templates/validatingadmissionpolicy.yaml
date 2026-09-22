@@ -1,0 +1,63 @@
+{{/*
+What kso's service account may never do, whatever its ClusterRole says: write to or exec into
+the namespaces the cluster itself runs from, or bind a role that makes a subject cluster-admin.
+
+kso needs wide rights - it creates namespaces, deploys into any it is told to, and gives
+workloads the cluster roles an operator configures - so they are not narrowed here. This is the
+part of them no feature needs: a pod started in kube-system can run as one of the control
+plane's service accounts, and exec there reaches them too. Somebody with code running in kso's
+pod could otherwise take the cluster that way.
+
+Roles themselves are not checked: Kubernetes already refuses kso a role or a binding that grants
+more than kso holds.
+
+Only where the cluster has the API (Kubernetes 1.30). Reads are not covered: admission sees
+changes only.
+*/}}
+{{- if and .Values.admissionPolicy.enabled (.Capabilities.APIVersions.Has "admissionregistration.k8s.io/v1/ValidatingAdmissionPolicy") }}
+{{- $name := include "kso.fullname" . }}
+{{- $user := printf "system:serviceaccount:%s:%s" .Release.Namespace (include "kso.serviceAccountName" .) }}
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicy
+metadata:
+  name: {{ $name }}
+  labels:
+    {{- include "kso.labels" . | nindent 4 }}
+spec:
+  failurePolicy: Fail
+  matchConstraints:
+    resourceRules:
+      - apiGroups: ["*"]
+        apiVersions: ["*"]
+        # "*/*", not "*": it takes in the subresources - exec and attach among them - as well.
+        resources: ["*/*"]
+        operations: ["CREATE", "UPDATE", "DELETE", "CONNECT"]
+  matchConditions:
+    - name: kso
+      expression: request.userInfo.username == {{ $user | quote }}
+  variables:
+    - name: protected
+      expression: {{ .Values.admissionPolicy.protectedNamespaces | toJson | quote }}
+  validations:
+    - expression: >-
+        !((has(request.namespace) && request.namespace in variables.protected) ||
+          (request.resource.resource == 'namespaces' && request.name in variables.protected))
+      messageExpression: "'kso does not change or exec into namespace ' + (has(request.namespace) ? request.namespace : request.name)"
+    - expression: >-
+        !(request.resource.group == 'rbac.authorization.k8s.io'
+          && request.resource.resource in ['rolebindings', 'clusterrolebindings']
+          && request.operation in ['CREATE', 'UPDATE'])
+        || !(object.roleRef.name == 'cluster-admin' || object.roleRef.name.startsWith('system:')
+          || (request.resource.resource == 'clusterrolebindings' && object.roleRef.name in ['admin', 'edit']))
+      messageExpression: "'kso does not bind ' + object.roleRef.name"
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicyBinding
+metadata:
+  name: {{ $name }}
+  labels:
+    {{- include "kso.labels" . | nindent 4 }}
+spec:
+  policyName: {{ $name }}
+  validationActions: [Deny]
+{{- end }}

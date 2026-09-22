@@ -210,6 +210,17 @@ centrifugo:
     limits:
       memory: 128Mi
 
+# What kso may never do, however wide its ClusterRole: change anything in, or exec into, these
+# namespaces, or bind cluster-admin, admin, edit or a system: role cluster-wide. On clusters with
+# ValidatingAdmissionPolicy (Kubernetes 1.30+). Add namespaces whose service accounts can do more
+# than kso should - an operator's, say.
+admissionPolicy:
+  enabled: true
+  protectedNamespaces:
+    - kube-system
+    - kube-public
+    - kube-node-lease
+
 # Admit traffic to kso's pod on the ports meant for it only - Apache and the push server - and
 # not on the push server's internal API. Off by default: it needs a cluster that enforces
 # NetworkPolicy, and knowing where your ingress controller runs.
