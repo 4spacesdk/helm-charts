@@ -30,8 +30,6 @@ spec:
               {{- with first .Values.ingress.hosts }}
             - name: BASE_URL
               value: https://{{ .host }}
-            - name: ZMQ_EXTERNAL_URL
-              value: wss://{{ .host }}/socket
               {{- end }}
               {{- end }}
               {{- end }}
@@ -40,8 +38,6 @@ spec:
               {{- with first .Values.istio.hosts }}
             - name: BASE_URL
               value: https://{{ .host }}
-            - name: ZMQ_EXTERNAL_URL
-              value: wss://{{ .host }}/socket
               {{- end }}
               {{- end }}
               {{- end }}
@@ -49,8 +45,6 @@ spec:
               {{- if .Values.contour.host }}
             - name: BASE_URL
               value: https://{{ .Values.contour.host }}
-            - name: ZMQ_EXTERNAL_URL
-              value: wss://{{ .Values.contour.host }}/socket
               {{- end }}
               {{- end }}
               {{- if .Values.gatewayapi.enabled }}
@@ -58,8 +52,6 @@ spec:
               {{- with first .Values.gatewayapi.hosts }}
             - name: BASE_URL
               value: https://{{ . }}
-            - name: ZMQ_EXTERNAL_URL
-              value: wss://{{ . }}/socket
               {{- end }}
               {{- end }}
               {{- end }}

@@ -55,7 +55,7 @@ spec:
               serviceName: {{ $fullName }}
               servicePort: 80
               {{- end }}
-          - path: {{ .path }}socket
+          - path: {{ .path }}connection
             {{- if and .pathType (semverCompare ">=1.18-0" $.Capabilities.KubeVersion.GitVersion) }}
             pathType: {{ .pathType }}
             {{- end }}
@@ -64,10 +64,10 @@ spec:
               service:
                 name: {{ $fullName }}
                 port:
-                  name: ratchet
+                  name: push
               {{- else }}
               serviceName: {{ $fullName }}
-              servicePort: 9100
+              servicePort: 8000
               {{- end }}
           {{- end }}
     {{- end }}

@@ -41,8 +41,8 @@ deployment:
   # Generate one on Linux or macOS with:  openssl rand -base64 24
   encryptionKey: ""
 
-  # Old keys, comma separated. Set this when rotating encryptionKey, so rows written with
-  # the previous one can still be read until they have been saved again.
+  # Old keys, comma separated. Set this when rotating encryptionKey, so what the old one
+  # encrypted can still be read until `php spark app:reencrypt` has written it again.
   previousEncryptionKeys: ""
 
   # A Secret of your own to read the passwords and the encryption key from, instead of the
@@ -188,19 +188,24 @@ resources:
   limits:
     memory: 1Gi
 
+# The push server, a sidecar in kso's pod: it sends kso's events to the open browsers.
+centrifugo:
+  image:
+    tag: v6.9.6
+  resources:
+    requests:
+      cpu: 10m
+      memory: 32Mi
+    limits:
+      memory: 128Mi
+
+# Lets kso manage Knative Services, for deployment specifications that run as one. Needs
+# Knative Serving installed in the cluster.
+knative:
+  enabled: false
+
 clusterrole: {}
 #  additionalRules:
-#    - apiGroups:
-#        - serving.knative.dev
-#      resources:
-#        - services
-#      verbs:
-#        - create
-#        - delete
-#        - get
-#        - list
-#        - patch
-#        - update
 #    - apiGroups:
 #        - rabbitmq.com
 #      resources:

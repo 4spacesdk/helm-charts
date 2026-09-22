@@ -11,9 +11,9 @@ spec:
       targetPort: 80
       protocol: TCP
       name: http
-    - port: 9100
-      targetPort: 9100
+    - port: 8000
+      targetPort: push
       protocol: TCP
-      name: ratchet
+      name: push
   selector:
     {{- include "kso.selectorLabels" . | nindent 4 }}

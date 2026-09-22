@@ -221,6 +221,55 @@ rules:
       - list
       - patch
       - update
+  # The registry pull secrets, and the Secret each workload's secret environment
+  # variables are kept in.
+  - apiGroups:
+      - ""
+    resources:
+      - secrets
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+  # A workload's Secret names it as its owner with blockOwnerDeletion, which a cluster that
+  # enforces owner reference permissions only allows with update on the owner's finalizers.
+  - apiGroups:
+      - apps
+    resources:
+      - deployments/finalizers
+    verbs:
+      - update
+  - apiGroups:
+      - batch
+    resources:
+      - cronjobs/finalizers
+      - jobs/finalizers
+    verbs:
+      - update
+  {{- if .Values.knative.enabled }}
+  # Knative Services, for deployment specifications that run as one - and their finalizers,
+  # for the Secret with the service's secret environment variables, as above.
+  - apiGroups:
+      - serving.knative.dev
+    resources:
+      - services
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+  - apiGroups:
+      - serving.knative.dev
+    resources:
+      - services/finalizers
+    verbs:
+      - update
+  {{- end }}
   {{- if .Values.contour.enabled }}
   - apiGroups:
       - projectcontour.io

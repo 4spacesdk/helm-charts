@@ -107,3 +107,13 @@ host - and answers on these as well; any other Host header is not trusted.
 {{- range .Values.deployment.config.extraHostnames }}{{ $hosts = append $hosts . }}{{ end -}}
 {{- $hosts | uniq | join "," -}}
 {{- end }}
+
+{{/*
+The origins a browser may open the push connection from: every hostname kso is served on, over
+https, space separated as Centrifugo reads them.
+*/}}
+{{- define "kso.pushAllowedOrigins" -}}
+{{- $origins := list -}}
+{{- range (splitList "," (include "kso.allowedHostnames" .)) }}{{ if . }}{{ $origins = append $origins (printf "https://%s" .) }}{{ end }}{{ end -}}
+{{- $origins | join " " -}}
+{{- end }}

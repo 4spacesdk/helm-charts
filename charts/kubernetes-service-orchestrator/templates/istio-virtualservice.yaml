@@ -14,12 +14,12 @@ spec:
   http:
     - match:
         - uri:
-            prefix: /socket
+            prefix: /connection
       route:
         - destination:
             host: {{ $fullName }}.{{ .Release.Namespace }}.svc.cluster.local
             port:
-              number: 9100
+              number: 8000
     - match:
         - uri:
             prefix: /

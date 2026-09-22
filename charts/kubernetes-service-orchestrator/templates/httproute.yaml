@@ -25,10 +25,10 @@ spec:
     - matches:
         - path:
             type: PathPrefix
-            value: /socket
+            value: /connection
       backendRefs:
         - name: {{ $fullName }}
-          port: 9100
+          port: 8000
     - matches:
         - path:
             type: PathPrefix

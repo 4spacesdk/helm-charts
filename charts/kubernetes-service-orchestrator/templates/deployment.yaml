@@ -12,6 +12,9 @@ spec:
   template:
     metadata:
       annotations:
+        # The push API key is read from a Secret too; a new one rolls the pods, so kso and the
+        # sidecar never disagree about it.
+        checksum/push: {{ include (print $.Template.BasePath "/secret-push.yaml") . | sha256sum }}
         {{- if not .Values.deployment.existingSecret }}
         # Values read from a Secret are not reloaded; a changed password rolls the pods.
         checksum/credentials: {{ include (print $.Template.BasePath "/secret-credentials.yaml") . | sha256sum }}
@@ -73,8 +76,8 @@ spec:
               {{- with first .Values.ingress.hosts }}
             - name: BASE_URL
               value: https://{{ .host }}
-            - name: ZMQ_EXTERNAL_URL
-              value: wss://{{ .host }}/socket
+            - name: CENTRIFUGO_EXTERNAL_URL
+              value: wss://{{ .host }}/connection/websocket
               {{- end }}
               {{- end }}
               {{- end }}
@@ -83,8 +86,8 @@ spec:
               {{- with first .Values.istio.hosts }}
             - name: BASE_URL
               value: https://{{ .host }}
-            - name: ZMQ_EXTERNAL_URL
-              value: wss://{{ .host }}/socket
+            - name: CENTRIFUGO_EXTERNAL_URL
+              value: wss://{{ .host }}/connection/websocket
               {{- end }}
               {{- end }}
               {{- end }}
@@ -92,8 +95,8 @@ spec:
               {{- if .Values.contour.host }}
             - name: BASE_URL
               value: https://{{ .Values.contour.host }}
-            - name: ZMQ_EXTERNAL_URL
-              value: wss://{{ .Values.contour.host }}/socket
+            - name: CENTRIFUGO_EXTERNAL_URL
+              value: wss://{{ .Values.contour.host }}/connection/websocket
               {{- end }}
               {{- end }}
               {{- if .Values.gatewayapi.enabled }}
@@ -101,8 +104,8 @@ spec:
               {{- with first .Values.gatewayapi.hosts }}
             - name: BASE_URL
               value: https://{{ . }}
-            - name: ZMQ_EXTERNAL_URL
-              value: wss://{{ . }}/socket
+            - name: CENTRIFUGO_EXTERNAL_URL
+              value: wss://{{ . }}/connection/websocket
               {{- end }}
               {{- end }}
               {{- end }}
@@ -120,6 +123,14 @@ spec:
                 secretKeyRef:
                   name: {{ include "kso.fullname" . }}-cron
                   key: cron-token
+            # The Centrifugo sidecar below, which kso publishes to on its internal port.
+            - name: CENTRIFUGO_API_URL
+              value: http://localhost:9000/api
+            - name: CENTRIFUGO_HTTP_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "kso.fullname" . }}-push
+                  key: api-key
             - name: KUBERNETES_AUTH
               value: in-cluster
             - name: REMOTE_CLUSTER_URL
@@ -168,6 +179,70 @@ spec:
           volumeMounts:
             - name: trivy-cache
               mountPath: /var/cache/kso-trivy
+        # Pushes kso's events to the browsers. Browsers connect on 8000, through /connection on
+        # the routing, with the access token they signed in with - checked against kso's key
+        # set, from kso's own container next to it - and may only subscribe, to any channel.
+        # kso publishes on 9000, which is not in the Service. A sidecar because there is one kso
+        # replica: with more, each pod would push only to the browsers connected to its own
+        # sidecar, and Centrifugo would have to move to a Deployment of its own.
+        - name: centrifugo
+          image: "centrifugo/centrifugo:{{ .Values.centrifugo.image.tag }}"
+          imagePullPolicy: IfNotPresent
+          args:
+            - centrifugo
+          ports:
+            - name: push
+              containerPort: 8000
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 9000
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 9000
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 65534
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+          {{- with .Values.centrifugo.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          env:
+            - name: CENTRIFUGO_HTTP_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "kso.fullname" . }}-push
+                  key: api-key
+            - name: CENTRIFUGO_CLIENT_TOKEN_JWKS_PUBLIC_ENDPOINT
+              value: http://localhost/api/openidconfiguration/jwks
+            # The OAuth client kso's own app signs in as; a token issued to another client is
+            # not for this.
+            - name: CENTRIFUGO_CLIENT_TOKEN_AUDIENCE
+              value: webclient
+            - name: CENTRIFUGO_CLIENT_ALLOWED_ORIGINS
+              value: {{ include "kso.pushAllowedOrigins" . | quote }}
+            - name: CENTRIFUGO_HTTP_SERVER_INTERNAL_PORT
+              value: "9000"
+            - name: CENTRIFUGO_HEALTH_ENABLED
+              value: "true"
+            # Subscribe for anyone with a token, publish for no one, and the last few messages
+            # of each channel kept for five minutes, so a browser that reconnects gets what it
+            # missed.
+            - name: CENTRIFUGO_CHANNEL_WITHOUT_NAMESPACE_ALLOW_SUBSCRIBE_FOR_CLIENT
+              value: "true"
+            - name: CENTRIFUGO_CHANNEL_WITHOUT_NAMESPACE_HISTORY_SIZE
+              value: "10"
+            - name: CENTRIFUGO_CHANNEL_WITHOUT_NAMESPACE_HISTORY_TTL
+              value: 300s
+            - name: CENTRIFUGO_CHANNEL_WITHOUT_NAMESPACE_FORCE_RECOVERY
+              value: "true"
       volumes:
         - name: trivy-cache
           emptyDir:

@@ -8,11 +8,11 @@ spec:
   ingressClassName: {{ .Values.contour.className }}
   routes:
     - conditions:
-        - prefix: /socket
+        - prefix: /connection
       enableWebsockets: true
       services:
         - name: {{ $fullName }}
-          port: 9100
+          port: 8000
     - conditions:
         - prefix: /
       services:
