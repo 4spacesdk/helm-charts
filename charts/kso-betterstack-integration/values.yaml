@@ -21,6 +21,17 @@ deployment:
 #    - name: ""
 #      value: ""
 
+  # Tokens and other secrets: the same shape as env, but put in a Secret that the pod reads,
+  # instead of in the Deployment.
+  secretEnv: [ ]
+#  secretEnv:
+#    - name: ""
+#      value: ""
+
+  # Or a Secret of your own - for External Secrets, Sealed Secrets and the like - whose keys
+  # all become environment variables.
+  existingSecret: ""
+
 serviceAccount:
   # Annotations to add to the service account
   annotations: { }

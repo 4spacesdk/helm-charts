@@ -11,10 +11,14 @@ spec:
       {{- include "kso.selectorLabels" . | nindent 6 }}
   template:
     metadata:
-      {{- with .Values.podAnnotations }}
       annotations:
+        {{- if .Values.deployment.secretEnv }}
+        # Values read from a Secret are not reloaded; a changed token rolls the pod.
+        checksum/env: {{ include (print $.Template.BasePath "/secret-env.yaml") . | sha256sum }}
+        {{- end }}
+        {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
-      {{- end }}
+        {{- end }}
       labels:
         {{- include "kso.labels" . | nindent 8 }}
         {{- with .Values.podLabels }}
@@ -58,6 +62,18 @@ spec:
             - name: {{ .name }}
               value: {{ .value | quote }}
             {{- end}}
+            {{- range .Values.deployment.secretEnv }}
+            - name: {{ .name }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "kso.fullname" $ }}-env
+                  key: {{ .name }}
+            {{- end }}
+          {{- with .Values.deployment.existingSecret }}
+          envFrom:
+            - secretRef:
+                name: {{ . }}
+          {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

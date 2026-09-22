@@ -56,13 +56,16 @@ spec:
             - name: http
               containerPort: 80
               protocol: TCP
+          # Liveness asks Apache only: a database that is down is not fixed by restarting kso.
           livenessProbe:
             httpGet:
               path: /
               port: http
+          # Readiness asks the application, which reads the database - a pod that cannot is
+          # taken out of the Service rather than answering every request with an error.
           readinessProbe:
             httpGet:
-              path: /
+              path: /api/settings
               port: http
           {{- if .Values.resources }}
           resources:

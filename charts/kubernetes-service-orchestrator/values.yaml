@@ -188,6 +188,11 @@ resources:
   limits:
     memory: 1Gi
 
+# The job that calls kso every minute to run its cron jobs.
+cronjob:
+  image:
+    tag: "8.22.0"
+
 # The push server, a sidecar in kso's pod: it sends kso's events to the open browsers.
 centrifugo:
   image:
@@ -198,6 +203,20 @@ centrifugo:
       memory: 32Mi
     limits:
       memory: 128Mi
+
+# Admit traffic to kso's pod on the ports meant for it only - Apache and the push server - and
+# not on the push server's internal API. Off by default: it needs a cluster that enforces
+# NetworkPolicy, and knowing where your ingress controller runs.
+networkPolicy:
+  enabled: false
+  # Who may connect, as NetworkPolicy peers. Empty is anyone. kso's own cron job is always
+  # let in. Set it and you have to include the namespaces your deployments run in as well: a
+  # migration job reports back to kso from there.
+  ingressFrom: [ ]
+#  ingressFrom:
+#    - namespaceSelector:
+#        matchLabels:
+#          kubernetes.io/metadata.name: ingress-nginx
 
 # Lets kso manage Knative Services, for deployment specifications that run as one. Needs
 # Knative Serving installed in the cluster.

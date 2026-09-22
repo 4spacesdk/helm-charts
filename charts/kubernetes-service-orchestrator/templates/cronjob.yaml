@@ -10,10 +10,29 @@ spec:
   jobTemplate:
     spec:
       template:
+        metadata:
+          labels:
+            # What the NetworkPolicy admits it by. Not kso's selector labels, which would put
+            # this pod behind kso's Service.
+            kso.4spaces.dk/role: cron
         spec:
+          # It only calls kso over http, and needs nothing from the cluster.
+          automountServiceAccountToken: false
+          securityContext:
+            seccompProfile:
+              type: RuntimeDefault
           containers:
             - name: callout
-              image: buildpack-deps:curl
+              image: "curlimages/curl:{{ .Values.cronjob.image.tag }}"
+              imagePullPolicy: IfNotPresent
+              securityContext:
+                runAsNonRoot: true
+                runAsUser: 100
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+                capabilities:
+                  drop:
+                    - ALL
               resources:
                 requests:
                   cpu: 50m
@@ -32,7 +51,8 @@ spec:
                     secretKeyRef:
                       name: {{ include "kso.fullname" . }}-cron
                       key: cron-token
-              args:
+              # command, not args: the image's entrypoint is curl itself.
+              command:
                 - /bin/sh
                 - -ec
                 - curl -fsS -H "X-Cron-Token: $CRON_TOKEN" {{ include "kso.fullname" . }}.{{ .Release.Namespace }}/api/jobby

@@ -1,0 +1,43 @@
+{{/*
+Only the ports meant to be reached: Apache (80) and Centrifugo's client port (8000). Centrifugo's
+API on 9000 takes publishes for every browser and is for kso in the same pod, and nothing else in
+the pod listens for anyone - without a policy every pod in the cluster can reach all of it.
+
+From `networkPolicy.ingressFrom` when set - the ingress controller's namespace, say - and from
+anywhere otherwise. Traffic out is not limited: kso talks to the Kubernetes API, the database,
+registries and webhooks, and where those are is the installation's business.
+*/}}
+{{- if .Values.networkPolicy.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "kso.fullname" . }}
+  labels:
+    {{- include "kso.labels" . | nindent 4 }}
+spec:
+  podSelector:
+    matchLabels:
+      {{- include "kso.selectorLabels" . | nindent 6 }}
+  policyTypes:
+    - Ingress
+  ingress:
+    - ports:
+        - port: 80
+          protocol: TCP
+        - port: 8000
+          protocol: TCP
+      {{- with .Values.networkPolicy.ingressFrom }}
+      from:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    {{- if .Values.networkPolicy.ingressFrom }}
+    # The scheduler, whatever ingressFrom says: it runs every cron job through /api/jobby.
+    - ports:
+        - port: 80
+          protocol: TCP
+      from:
+        - podSelector:
+            matchLabels:
+              kso.4spaces.dk/role: cron
+    {{- end }}
+{{- end }}
