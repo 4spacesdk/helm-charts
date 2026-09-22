@@ -68,4 +68,13 @@ spec:
             - name: DB_USER
               value: {{ required "Database is required" .Values.deployment.database.user | quote }}
             {{- include "kso.credentialsEnv" . | nindent 12 }}
+            {{- include "kso.databaseTlsEnv" . | nindent 12 }}
+          {{- if .Values.deployment.database.tls.enabled }}
+          volumeMounts:
+            {{- include "kso.databaseTlsVolumeMount" . | nindent 12 }}
+          {{- end }}
+      {{- if .Values.deployment.database.tls.enabled }}
+      volumes:
+        {{- include "kso.databaseTlsVolume" . | nindent 8 }}
+      {{- end }}
       restartPolicy: OnFailure

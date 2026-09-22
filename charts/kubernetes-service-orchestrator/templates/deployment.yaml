@@ -123,6 +123,7 @@ spec:
             - name: DB_USER
               value: {{ required "Database is required" .Values.deployment.database.user | quote }}
             {{- include "kso.credentialsEnv" . | nindent 12 }}
+            {{- include "kso.databaseTlsEnv" . | nindent 12 }}
             - name: CRON_TOKEN
               valueFrom:
                 secretKeyRef:
@@ -184,6 +185,7 @@ spec:
           volumeMounts:
             - name: trivy-cache
               mountPath: /var/cache/kso-trivy
+            {{- include "kso.databaseTlsVolumeMount" . | nindent 12 }}
         # Pushes kso's events to the browsers. Browsers connect on 8000, through /connection on
         # the routing, with the access token they signed in with - checked against kso's key
         # set, from kso's own container next to it - and may only subscribe, to any channel.
@@ -252,6 +254,7 @@ spec:
         - name: trivy-cache
           emptyDir:
             sizeLimit: {{ .Values.deployment.imageScanning.cacheSizeLimit | default "4Gi" }}
+        {{- include "kso.databaseTlsVolume" . | nindent 8 }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

@@ -33,6 +33,17 @@ deployment:
     name: ""
     user: ""
     pass: ""
+    # TLS to the database, with the certificates from a Secret of your own: ca.crt, the CA the
+    # server's certificate is checked against, and - with clientCertificate - tls.crt and
+    # tls.key, for a server that asks for one (Cloud SQL with trusted client certificates).
+    # The keys cert-manager writes. Off, kso connects without TLS.
+    tls:
+      enabled: false
+      secretName: ""
+      clientCertificate: false
+      # Also check that the certificate is for database.host. Turn off only for a server whose
+      # certificate names something else - it is still checked against ca.crt.
+      verifyServerCert: true
 
   # Required. What the credentials kso stores for other systems - registry passwords,
   # database passwords, webhook tokens - are encrypted with, along with the refresh-token

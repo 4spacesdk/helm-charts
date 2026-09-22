@@ -117,3 +117,43 @@ https, space separated as Centrifugo reads them.
 {{- range (splitList "," (include "kso.allowedHostnames" .)) }}{{ if . }}{{ $origins = append $origins (printf "https://%s" .) }}{{ end }}{{ end -}}
 {{- $origins | join " " -}}
 {{- end }}
+
+{{/*
+TLS to the database, from the Secret deployment.database.tls names: where kso finds the
+certificates, and the volume they are mounted from. Shared by the deployment and the
+migration job.
+*/}}
+{{- define "kso.databaseTlsEnv" -}}
+{{- with .Values.deployment.database.tls }}
+{{- if .enabled }}
+- name: DB_SSL_CA
+  value: /etc/kso/database-tls/ca.crt
+{{- if .clientCertificate }}
+- name: DB_SSL_CERT
+  value: /etc/kso/database-tls/tls.crt
+- name: DB_SSL_KEY
+  value: /etc/kso/database-tls/tls.key
+{{- end }}
+- name: DB_SSL_VERIFY
+  value: {{ ternary "true" "false" (ne .verifyServerCert false) | quote }}
+{{- end }}
+{{- end }}
+{{- end }}
+
+{{- define "kso.databaseTlsVolumeMount" -}}
+{{- if .Values.deployment.database.tls.enabled }}
+- name: database-tls
+  mountPath: /etc/kso/database-tls
+  readOnly: true
+{{- end }}
+{{- end }}
+
+{{- define "kso.databaseTlsVolume" -}}
+{{- with .Values.deployment.database.tls }}
+{{- if .enabled }}
+- name: database-tls
+  secret:
+    secretName: {{ required "deployment.database.tls.secretName is required when TLS is enabled" .secretName }}
+{{- end }}
+{{- end }}
+{{- end }}
