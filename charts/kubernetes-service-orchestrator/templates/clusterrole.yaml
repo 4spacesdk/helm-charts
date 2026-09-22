@@ -249,6 +249,16 @@ rules:
       - jobs/finalizers
     verbs:
       - update
+  # What `kubectl top` reads, for the cpu and memory kso shows on a deployment. Served by
+  # metrics-server, which is not part of Kubernetes: without it these rights are harmless and the
+  # numbers are simply not there.
+  - apiGroups:
+      - metrics.k8s.io
+    resources:
+      - pods
+    verbs:
+      - get
+      - list
   {{- if .Values.knative.enabled }}
   # Knative Services, for deployment specifications that run as one - and their finalizers,
   # for the Secret with the service's secret environment variables, as above.

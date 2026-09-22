@@ -41,8 +41,8 @@ deployment:
       enabled: false
       secretName: ""
       clientCertificate: false
-      # Also check that the certificate is for database.host. Turn off only for a server whose
-      # certificate names something else - it is still checked against ca.crt.
+      # Check the server's certificate: signed by ca.crt and naming database.host. The two go
+      # together - off, the connection is encrypted but the certificate is not checked at all.
       verifyServerCert: true
 
   # Required. What the credentials kso stores for other systems - registry passwords,
