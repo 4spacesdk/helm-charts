@@ -55,5 +55,7 @@ spec:
               command:
                 - /bin/sh
                 - -ec
-                - curl -fsS -H "X-Cron-Token: $CRON_TOKEN" {{ include "kso.fullname" . }}.{{ .Release.Namespace }}/api/jobby
+                # Quoted whole: unquoted, the `: ` in the header made YAML read the line as a map, and
+                # the api server refused the CronJob - "cannot unmarshal object into ... command".
+                - 'curl -fsS -H "X-Cron-Token: $CRON_TOKEN" {{ include "kso.fullname" . }}.{{ .Release.Namespace }}/api/jobby'
           restartPolicy: Never
