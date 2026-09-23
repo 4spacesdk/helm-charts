@@ -249,13 +249,14 @@ rules:
       - jobs/finalizers
     verbs:
       - update
-  # What `kubectl top` reads, for the cpu and memory kso shows on a deployment. Served by
-  # metrics-server, which is not part of Kubernetes: without it these rights are harmless and the
-  # numbers are simply not there.
+  # What `kubectl top` reads, for the cpu and memory kso shows on a deployment and on the cluster's
+  # nodes. Served by metrics-server, which is not part of Kubernetes: without it these rights are
+  # harmless and the numbers are simply not there.
   - apiGroups:
       - metrics.k8s.io
     resources:
       - pods
+      - nodes
     verbs:
       - get
       - list
