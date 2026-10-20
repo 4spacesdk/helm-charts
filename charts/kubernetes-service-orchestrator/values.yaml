@@ -238,8 +238,9 @@ admissionPolicy:
 networkPolicy:
   enabled: false
   # Who may connect, as NetworkPolicy peers. Empty is anyone. kso's own cron job is always
-  # let in. Set it and you have to include the namespaces your deployments run in as well: a
-  # migration job reports back to kso from there.
+  # let in. Nothing in the namespaces kso deploys to calls kso: since 1.9.4 it follows the
+  # migration jobs through the Kubernetes API. A workspace's namespace is labelled
+  # `app.kubernetes.io/managed-by: kso`, should a deployment call it all the same.
   ingressFrom: [ ]
 #  ingressFrom:
 #    - namespaceSelector:
